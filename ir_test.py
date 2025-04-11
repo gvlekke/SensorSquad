@@ -1,46 +1,22 @@
-import RPi.GPIO as GPIO
+# Required modules are imported
+from gpiozero import LED
 import time
 
-# Set up GPIO pin numbers
-IR_TRANSMITTER_PIN = 14  # GPIO pin for KY005 transmitter
-IR_RECEIVER_PIN = 15     # GPIO pin for KY022 receiver
+# Initialize the LED on pin 15
+led = LED(15)
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+print("LED test [press CTRL+C to end the test]")
 
-# Set up GPIO pins
-GPIO.setup(IR_TRANSMITTER_PIN, GPIO.OUT)
-GPIO.setup(IR_RECEIVER_PIN, GPIO.IN)
-
+# Main program loop
 try:
-    print("IR monitoring started. Press CTRL+C to exit.")
-    last_state = None
-    
-    # Continuously transmit IR signal
-    GPIO.output(IR_TRANSMITTER_PIN, GPIO.HIGH)
-    
-    # Monitor the receiver
     while True:
-        # Read the state of the IR receiver
-        # When signal is received, the pin will be LOW (0)
-        # When signal is blocked, the pin will be HIGH (1)
-        current_state = GPIO.input(IR_RECEIVER_PIN)
-        
-        # Update output only when state changes to avoid flooding the console
-        if current_state != last_state:
-            if current_state == 0:  # Signal received
-                print("received")
-            else:  # Signal blocked
-                print("blocked")
-            
-            last_state = current_state
-        
-        time.sleep(0.1)  # Small delay to prevent CPU overuse
+        print("LED on for 4 seconds")
+        led.on()  # LED is switched on
+        time.sleep(4)  # Wait mode for 4 seconds
+        print("LED 2 Sekunden aus")
+        led.off()  # LED is switched off
+        time.sleep(2)  # Waiting mode for a further two seconds, during which the LED is then switched off
 
+# Clean up after the program has been completed
 except KeyboardInterrupt:
-    print("\nProgram stopped by user")
-finally:
-    # Clean up GPIO settings
-    GPIO.output(IR_TRANSMITTER_PIN, GPIO.LOW)
-    GPIO.cleanup()
+    led.close()  # Release of resources
